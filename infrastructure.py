@@ -99,15 +99,21 @@ class APIVPC(VPC):
                             DestinationCidrBlock=peering_config[self.PEERING_DESTINATION_RANGE_CONFIG][vpc_name][self.ENVIRONMENT],
                             VpcPeeringConnectionId=Ref(peering_connection))
 
-                    """ Routes to Peering Connection for peer VPC """
-                    count = 0
-                    for route_table in peering_config[self.PEERING_DESTINATION_ROUTE_TABLES_CONFIG][vpc_name][self.ENVIRONMENT]:
-                        count += 1
-                        self.ec2_helper.create_route(
-                            name_prefix='{0}{1}PeerVPC'.format(vpc_name, count),
-                            RouteTableId=route_table,
-                            DestinationCidrBlock=GetAtt(self.vpc, 'CidrBlock'),
-                            VpcPeeringConnectionId=Ref(peering_connection))
+                    """ Routes to Peering Connection for peer VPC Primary CIDR """
+                    #count = 0
+                    #for route_table in peering_config[self.PEERING_DESTINATION_ROUTE_TABLES_CONFIG][vpc_name][self.ENVIRONMENT]:
+                    #    count += 1
+                    #    self.ec2_helper.create_route(
+                    #        name_prefix='{0}{1}PeerVPC'.format(self.PROJECT, count),
+                    #        RouteTableId=route_table,
+                    #        DestinationCidrBlock=GetAtt(self.vpc, 'CidrBlock'),
+                    #        VpcPeeringConnectionId=Ref(peering_connection))
+
+                    #    self.ec2_helper.create_route(
+                    #        name_prefix='{0}{1}PeerVPC'.format(vpc_name, count),
+                    #        RouteTableId=route_table,
+                    #        DestinationCidrBlock=GetAtt(self.vpc, 'CidrBlock'),
+                    #        VpcPeeringConnectionId=Ref(peering_connection))
 
             except Exception as e:
                 pass

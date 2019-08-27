@@ -232,7 +232,7 @@
             ]
           },
           {
-            "Name": "DeployAWSResources",
+            "Name": "CreateChangeset-AWSResources",
             "Actions": [
               {
                 "ActionTypeId": {
@@ -262,9 +262,14 @@
                   "TemplatePath": "CompiledCFNTemplate::template.json"
                 },
                 "RunOrder": 1
-              },
+              }
+            ]
+          },
+          {
+            "Name": "ExecuteChangeset-AWSResources",
+            "Actions": [
               {
-                "RunOrder": 2,
+                "RunOrder": 1,
                 "ActionTypeId": {
                   "Category": "Deploy",
                   "Owner": "AWS",
