@@ -112,26 +112,20 @@ class APIVPC(VPC):
                 pass
 
         """ SQS Queues """
+        sqs_queues_names = ['Notifications', 'SFDC', 'UpdateOpportunity', 'StatementAggregation']
+        sqs_queues = []
         sqs_attributes = {
             'VisibilityTimeout': '120'
         }
-        notifications_queue = self.sqs_helper.create_queue(name_prefix='Notifications', **sqs_attributes)
-        sfdc_queue = self.sqs_helper.create_queue(name_prefix='SFDC', **sqs_attributes)
-        update_opportunity_queue = self.sqs_helper.create_queue(name_prefix='UpdateOpportunity',
-                                                                    **sqs_attributes)
-        statement_aggregation_queue = self.sqs_helper.create_queue(name_prefix='StatementAggregation',
-                                                                       **sqs_attributes)
+        for queue_name in sqs_queues_names:
+            sqs_queues.append(self.sqs_helper.create_queue(name_prefix=queue_name, **sqs_attributes))
 
         """ Outputs """
-        self.create_output(name='NotificationsQueue', value=GetAtt(notifications_queue, 'QueueName'))
-        self.create_output(name='NotificationsQueueARN', value=GetAtt(notifications_queue, 'Arn'))
-        self.create_output(name='SFDCQueue', value=GetAtt(sfdc_queue, 'QueueName'))
-        self.create_output(name='SFDCQueueARN', value=GetAtt(sfdc_queue, 'Arn'))
-        self.create_output(name='UpdateOpportunityQueue', value=GetAtt(update_opportunity_queue, 'QueueName'))
-        self.create_output(name='UpdateOpportunityQueueARN', value=GetAtt(update_opportunity_queue, 'Arn'))
-        self.create_output(name='StatementAggregationQueue', value=GetAtt(statement_aggregation_queue, 'QueueName'))
-        self.create_output(name='StatementAggregationQueueUrl', value=Ref(statement_aggregation_queue))
-        self.create_output(name='StatementAggregationARN', value=GetAtt(statement_aggregation_queue, 'Arn'))
+        for queue in sqs_queues:
+            self.create_output(name=queue.title, value=GetAtt(queue, 'QueueName'))
+            self.create_output(name='{0}Url'.format(queue.title), value=Ref(queue))
+            self.create_output(name='{0}ARN'.format(queue.title), value=GetAtt(queue, 'Arn'))
+
 
 if __name__ == '__main__':
     api_vpc = APIVPC()
