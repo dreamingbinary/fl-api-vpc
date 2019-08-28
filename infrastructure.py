@@ -43,7 +43,7 @@ class APIVPC(VPC):
                 },
                 PEERING_DESTINATION_ROUTE_TABLES_CONFIG: {
                     'FAWSORG': {
-                        'STG': ['rtb-076b4660', 'rtb-2e847549'],
+                        'STG': ['rtb-076b4660', 'rtb-05c0db8b6136b48a3'],
                         'PRD': ['rtb-076b4660', 'rtb-2e847549'],
                     }
                 }
