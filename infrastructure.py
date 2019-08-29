@@ -43,7 +43,7 @@ class APIVPC(VPC):
                 },
                 PEERING_DESTINATION_ROUTE_TABLES_CONFIG: {
                     'FAWSORG': {
-                        'STG': ['rtb-076b4660', 'rtb-2e847549'],
+                        'STG': ['rtb-076b4660', 'rtb-05c0db8b6136b48a3'],
                         'PRD': ['rtb-076b4660', 'rtb-2e847549'],
                     }
                 }
@@ -78,60 +78,41 @@ class APIVPC(VPC):
         """ Peering Connection Resources """
         for project, config in self.PROJECTS.items():
             try:
-                for vpc_name, environment in self.PEERING_DESTINATION_RANGE_CONFIG.items():
-                    if self.ENVIRONMENT not in config:
+                peering_config = config[self.PEERING_CONFIG]
+                for vpc_name, environment in peering_config[self.PEERING_DESTINATION_RANGE_CONFIG].items():
+                    if self.ENVIRONMENT not in environment:
                         continue
 
-                """ Peering Connection """
-                peering_connection = self.ec2_helper.create_peering_connection(
-                    vpc=Ref(self.vpc),
-                    peer_vpc=self.PEERING_DESTINATION_VPC_CONFIG[config_name][self.ENVIRONMENT],
-                    peer_name='{0}-to-{1}-{2}'.format(self.PROJECT, config_name, self.ENVIRONMENT),
-                    name_prefix=config_name
-                )
+                    """ Peering Connection """
+                    peering_connection = self.ec2_helper.create_peering_connection(
+                        vpc=Ref(self.vpc),
+                        peer_vpc=peering_config[self.PEERING_DESTINATION_VPC_CONFIG][vpc_name][self.ENVIRONMENT],
+                        peer_name='{0}-to-{1}-{2}'.format(self.PROJECT, vpc_name, self.ENVIRONMENT),
+                        name_prefix=vpc_name
+                    )
 
-                """ Routes to Peering Connection for this VPC """
-                for route_table in self.private_route_tables:
-                    self.ec2_helper.create_route(
-                        name_prefix='{0}{1}'.format(config_name, route_table.title),
-                        RouteTableId=Ref(route_table),
-                        DestinationCidrBlock=config[self.ENVIRONMENT],
-                        VpcPeeringConnectionId=Ref(peering_connection))
+                    """ Routes to Peering Connection for this VPC """
+                    for route_table in self.private_route_tables:
+                        self.ec2_helper.create_route(
+                            name_prefix='{0}{1}'.format(vpc_name, route_table.title),
+                            RouteTableId=Ref(route_table),
+                            DestinationCidrBlock=peering_config[self.PEERING_DESTINATION_RANGE_CONFIG][vpc_name][self.ENVIRONMENT],
+                            VpcPeeringConnectionId=Ref(peering_connection))
 
-                """ Routes to Peering Connection for peer VPC """
-                count = 0
-                for route_table in self.PEERING_DESTINATION_ROUTE_TABLES_CONFIG[config_name][self.ENVIRONMENT]:
-                    count += 1
-                    self.ec2_helper.create_route(
-                        name_prefix='{0}{1}PeerVPC'.format(config_name, count),
-                        RouteTableId=route_table,
-                        DestinationCidrBlock=GetAtt(self.vpc, 'CidrBlock'),
-                        VpcPeeringConnectionId=Ref(peering_connection))
+                    """ Routes to Peering Connection for peer VPC CIDR """
+                    count = 0
+                    for route_table in peering_config[self.PEERING_DESTINATION_ROUTE_TABLES_CONFIG][vpc_name][self.ENVIRONMENT]:
+                        count += 1
+                        # Additional project CIDR
+                        self.ec2_helper.create_route(
+                            name_prefix='{0}{1}PeerVPC'.format(project, count),
+                            RouteTableId=route_table,
+                            DestinationCidrBlock=config['CIDR'],
+                            VpcPeeringConnectionId=Ref(peering_connection))
 
             except Exception as e:
                 pass
 
-        """ SQS Queues """
-        sqs_attributes = {
-            'VisibilityTimeout': '120'
-        }
-        notifications_queue = self.sqs_helper.create_queue(name_prefix='Notifications', **sqs_attributes)
-        sfdc_queue = self.sqs_helper.create_queue(name_prefix='SFDC', **sqs_attributes)
-        update_opportunity_queue = self.sqs_helper.create_queue(name_prefix='UpdateOpportunity',
-                                                                    **sqs_attributes)
-        statement_aggregation_queue = self.sqs_helper.create_queue(name_prefix='StatementAggregation',
-                                                                       **sqs_attributes)
-
-        """ Outputs """
-        self.create_output(name='NotificationsQueue', value=GetAtt(notifications_queue, 'QueueName'))
-        self.create_output(name='NotificationsQueueARN', value=GetAtt(notifications_queue, 'Arn'))
-        self.create_output(name='SFDCQueue', value=GetAtt(sfdc_queue, 'QueueName'))
-        self.create_output(name='SFDCQueueARN', value=GetAtt(sfdc_queue, 'Arn'))
-        self.create_output(name='UpdateOpportunityQueue', value=GetAtt(update_opportunity_queue, 'QueueName'))
-        self.create_output(name='UpdateOpportunityQueueARN', value=GetAtt(update_opportunity_queue, 'Arn'))
-        self.create_output(name='StatementAggregationQueue', value=GetAtt(statement_aggregation_queue, 'QueueName'))
-        self.create_output(name='StatementAggregationQueueUrl', value=Ref(statement_aggregation_queue))
-        self.create_output(name='StatementAggregationARN', value=GetAtt(statement_aggregation_queue, 'Arn'))
 
 if __name__ == '__main__':
     api_vpc = APIVPC()
