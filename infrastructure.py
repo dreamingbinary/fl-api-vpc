@@ -113,21 +113,6 @@ class APIVPC(VPC):
             except Exception as e:
                 pass
 
-        """ SQS Queues """
-        sqs_queues_names = ['Notifications', 'SFDC', 'UpdateOpportunity', 'StatementAggregation']
-        sqs_queues = []
-        sqs_attributes = {
-            'VisibilityTimeout': '120'
-        }
-        for queue_name in sqs_queues_names:
-            sqs_queues.append(self.sqs_helper.create_queue(name_prefix=queue_name, **sqs_attributes))
-
-        """ Outputs """
-        for queue in sqs_queues:
-            self.create_output(name=queue.title, value=GetAtt(queue, 'QueueName'))
-            self.create_output(name='{0}Url'.format(queue.title), value=Ref(queue))
-            self.create_output(name='{0}ARN'.format(queue.title), value=GetAtt(queue, 'Arn'))
-
 
 if __name__ == '__main__':
     api_vpc = APIVPC()
