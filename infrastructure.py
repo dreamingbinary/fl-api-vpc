@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from troposphere import Ref, GetAtt, Join
+from troposphere import Ref, GetAtt, Join, ImportValue
 import json
 import sys
 import os
@@ -19,6 +19,8 @@ class APIVPC(VPC):
     BANKSTATEMENTS_API = 'SharedBankStatementsAPI'
     APPLY_API = 'SharedApplyAPI'
     INCONTACT_DATA_MOVER = 'SharedInContactDataMover'
+    PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
+    PROSPECTS_ELASTIC_SEARCH_CIDR = BASE_VPC_CIDR.format(VPC.get_second_octet(PROSPECTS_ELASTIC_SEARCH, ENVIRONMENT))
     PEERING_CONFIG = 'PEERING_CONFIG'
     PEERING_DESTINATION_VPC_CONFIG = 'PEERING_DESTINATION_VPC_CONFIG'
     PEERING_DESTINATION_RANGE_CONFIG = 'PEERING_DESTINATION_RANGE_CONFIG'
@@ -52,6 +54,20 @@ class APIVPC(VPC):
         },
         APPLY_API: {
             SECOND_OCTET: VPC.get_second_octet(APPLY_API, ENVIRONMENT),
+            PEERING_CONFIG: {
+                PEERING_DESTINATION_VPC_CONFIG: {
+                    PROSPECTS_ELASTIC_SEARCH: {
+                        'STG': ImportValue('LeadMatching-STG-VPC'),
+                        'PRD': ImportValue('LeadMatching-PRD-VPC'),
+                    }
+                },
+                PEERING_DESTINATION_RANGE_CONFIG: {
+                    PROSPECTS_ELASTIC_SEARCH: {
+                        'STG': PROSPECTS_ELASTIC_SEARCH_CIDR,
+                        'PRD': PROSPECTS_ELASTIC_SEARCH_CIDR,
+                    }
+                },
+            }
         },
         INCONTACT_DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(INCONTACT_DATA_MOVER, ENVIRONMENT),
@@ -96,7 +112,8 @@ class APIVPC(VPC):
                     )
 
                     """ Routes to Peering Connection for this VPC """
-                    for route_table in self.private_route_tables:
+                    project_route_tables = [route_table for route_table in self.private_route_tables if project in route_table.title]
+                    for route_table in project_route_tables:
                         self.ec2_helper.create_route(
                             name_prefix='{0}{1}'.format(vpc_name, route_table.title),
                             RouteTableId=Ref(route_table),
