@@ -79,12 +79,18 @@ class APIVPC(VPC):
         OPPORTUNITY_FEEDER: {
             SECOND_OCTET: VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT),
             PRIVATE_SUBNETS_CONFIG: {
-                'OpportunityFeederDecisionModuleAgentA': '10.{0}.10.0/24'.format(SECOND_OCTET),
-                'OpportunityFeederDecisionModuleAgentB': '10.{0}.11.0/24'.format(SECOND_OCTET),
-                'OpportunityFeederUnfinishedMasterA': '10.{0}.12.0/24'.format(SECOND_OCTET),
-                'OpportunityFeederUnfinishedMasterB': '10.{0}.13.0/24'.format(SECOND_OCTET),
-                'OpportunityFeederUnfinishedAgentA': '10.{0}.14.0/24'.format(SECOND_OCTET),
-                'OpportunityFeederUnfinishedAgentB': '10.{0}.15.0/24'.format(SECOND_OCTET),
+                'OpportunityFeederDecisionModuleAgentA': '10.{0}.10.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederDecisionModuleAgentB': '10.{0}.11.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedMasterA': '10.{0}.12.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedMasterB': '10.{0}.13.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedAgentA': '10.{0}.14.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedAgentB': '10.{0}.15.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
             },
         },
     }
