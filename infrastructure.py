@@ -18,6 +18,7 @@ class APIVPC(VPC):
     APPLY_API = 'SharedApplyAPI'
     INCONTACT_DATA_MOVER = 'SharedInContactDataMover'
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
+    PROSPECTS_API = 'SharedProspectsAPI'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
 
@@ -75,6 +76,9 @@ class APIVPC(VPC):
         },
         INCONTACT_DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(INCONTACT_DATA_MOVER, ENVIRONMENT),
+        },
+        PROSPECTS_API: {
+            SECOND_OCTET: VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT),
         },
         OPPORTUNITY_FEEDER: {
             SECOND_OCTET: VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT),
