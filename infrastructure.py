@@ -12,21 +12,25 @@ class APIVPC(VPC):
 
     PROJECT = 'APIVPC'
     ENVIRONMENT = os.environ['ENVIRONMENT']
-
     BASE_VPC_CIDR = '10.{0}.0.0/16'
 
-    SECOND_OCTET = 'SECOND_OCTET'
     BANKSTATEMENTS_API = 'SharedBankStatementsAPI'
     APPLY_API = 'SharedApplyAPI'
     INCONTACT_DATA_MOVER = 'SharedInContactDataMover'
+    OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
+
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
-    PROSPECTS_ELASTIC_SEARCH_CIDR = BASE_VPC_CIDR.format(VPC.get_second_octet(PROSPECTS_ELASTIC_SEARCH, ENVIRONMENT))
+
+    SECOND_OCTET = 'SECOND_OCTET'
     PEERING_CONFIG = 'PEERING_CONFIG'
     PEERING_DESTINATION_VPC_CONFIG = 'PEERING_DESTINATION_VPC_CONFIG'
     PEERING_DESTINATION_RANGE_CONFIG = 'PEERING_DESTINATION_RANGE_CONFIG'
     PEERING_DESTINATION_ROUTE_TABLES_CONFIG = 'PEERING_DESTINATION_ROUTE_TABLES_CONFIG'
+    PRIVATE_SUBNETS_CONFIG = 'PRIVATE_SUBNETS_CONFIG'
 
     VPC_SECOND_OCTET = VPC.get_second_octet(PROJECT, ENVIRONMENT)
+
+    PROSPECTS_ELASTIC_SEARCH_CIDR = BASE_VPC_CIDR.format(VPC.get_second_octet(PROSPECTS_ELASTIC_SEARCH, ENVIRONMENT))
 
     PROJECTS = {
         BANKSTATEMENTS_API: {
@@ -72,6 +76,23 @@ class APIVPC(VPC):
         INCONTACT_DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(INCONTACT_DATA_MOVER, ENVIRONMENT),
         },
+        OPPORTUNITY_FEEDER: {
+            SECOND_OCTET: VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT),
+            PRIVATE_SUBNETS_CONFIG: {
+                'OpportunityFeederDecisionModuleAgentA': '10.{0}.10.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederDecisionModuleAgentB': '10.{0}.11.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedMasterA': '10.{0}.12.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedMasterB': '10.{0}.13.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedAgentA': '10.{0}.14.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+                'OpportunityFeederUnfinishedAgentB': '10.{0}.15.0/24'.format(
+                    VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT)),
+            },
+        },
     }
 
     CIDR = BASE_VPC_CIDR.format(VPC_SECOND_OCTET)
@@ -84,9 +105,12 @@ class APIVPC(VPC):
 
     for project, config in PROJECTS.items():
         second_octet = config[SECOND_OCTET]
-        PRIVATE_SUBNETS.update({'{0}A'.format(project): '10.{0}.10.0/24'.format(second_octet)})
-        PRIVATE_SUBNETS.update({'{0}B'.format(project): '10.{0}.11.0/24'.format(second_octet)})
         PROJECTS[project].update({'CIDR': BASE_VPC_CIDR.format(second_octet)})
+        if PRIVATE_SUBNETS_CONFIG in config:
+            PRIVATE_SUBNETS.update(config[PRIVATE_SUBNETS_CONFIG])
+        else:
+            PRIVATE_SUBNETS.update({'{0}A'.format(project): '10.{0}.10.0/24'.format(second_octet)})
+            PRIVATE_SUBNETS.update({'{0}B'.format(project): '10.{0}.11.0/24'.format(second_octet)})
 
     INTERFACE_SUBNETS = {
         'InterfaceA': '10.{0}.3.0/25'.format(VPC_SECOND_OCTET),
