@@ -16,6 +16,7 @@ class APIVPC(VPC):
 
     BANKSTATEMENTS_API = 'SharedBankStatementsAPI'
     APPLY_API = 'SharedApplyAPI'
+    INCONTACT_DATA_MOVER = 'SharedInContactDataMover'
     DATA_MOVER = 'SharedDataMover'
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
     PROSPECTS_API = 'SharedProspectsAPI'
@@ -73,6 +74,9 @@ class APIVPC(VPC):
                     }
                 },
             }
+        },
+        INCONTACT_DATA_MOVER: {
+            SECOND_OCTET: VPC.get_second_octet(INCONTACT_DATA_MOVER, ENVIRONMENT),
         },
         DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(DATA_MOVER, ENVIRONMENT),
