@@ -16,10 +16,10 @@ class APIVPC(VPC):
 
     BANKSTATEMENTS_API = 'SharedBankStatementsAPI'
     APPLY_API = 'SharedApplyAPI'
-    INCONTACT_DATA_MOVER = 'SharedInContactDataMover'
     DATA_MOVER = 'SharedDataMover'
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
     PROSPECTS_API = 'SharedProspectsAPI'
+    FORSIGHT_API = 'SharedForsightAPI'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
 
@@ -75,8 +75,8 @@ class APIVPC(VPC):
                 },
             }
         },
-        INCONTACT_DATA_MOVER: {
-            SECOND_OCTET: VPC.get_second_octet(INCONTACT_DATA_MOVER, ENVIRONMENT),
+        FORSIGHT_API: {
+            SECOND_OCTET: VPC.get_second_octet(FORSIGHT_API, ENVIRONMENT),
         },
         DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(DATA_MOVER, ENVIRONMENT),
