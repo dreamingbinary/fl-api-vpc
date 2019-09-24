@@ -29,6 +29,7 @@ class APIVPC(VPC):
     PEERING_DESTINATION_RANGE_CONFIG = 'PEERING_DESTINATION_RANGE_CONFIG'
     PEERING_DESTINATION_ROUTE_TABLES_CONFIG = 'PEERING_DESTINATION_ROUTE_TABLES_CONFIG'
     PRIVATE_SUBNETS_CONFIG = 'PRIVATE_SUBNETS_CONFIG'
+    PUBLIC_SUBNETS_CONFIG = 'PUBLIC_SUBNETS_CONFIG'
 
     VPC_SECOND_OCTET = VPC.get_second_octet(PROJECT, ENVIRONMENT)
 
@@ -83,6 +84,12 @@ class APIVPC(VPC):
         },
         PROSPECTS_API: {
             SECOND_OCTET: VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT),
+            PUBLIC_SUBNETS_CONFIG: {
+                'ProspectsDBA': '10.{0}.100.0/24'.format(
+                    VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT)),
+                'ProspectsDBB': '10.{0}.101.0/24'.format(
+                    VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT)),
+            }
         },
         OPPORTUNITY_FEEDER: {
             SECOND_OCTET: VPC.get_second_octet(OPPORTUNITY_FEEDER, ENVIRONMENT),
@@ -119,6 +126,8 @@ class APIVPC(VPC):
         else:
             PRIVATE_SUBNETS.update({'{0}A'.format(project): '10.{0}.10.0/24'.format(second_octet)})
             PRIVATE_SUBNETS.update({'{0}B'.format(project): '10.{0}.11.0/24'.format(second_octet)})
+        if PUBLIC_SUBNETS_CONFIG in config:
+            PUBLIC_SUBNETS.update(config[PUBLIC_SUBNETS_CONFIG])
 
     INTERFACE_SUBNETS = {
         'InterfaceA': '10.{0}.3.0/25'.format(VPC_SECOND_OCTET),
