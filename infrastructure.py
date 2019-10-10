@@ -87,7 +87,7 @@ class APIVPC(VPC):
             PUBLIC_SUBNETS_CONFIG: {
                 'ProspectsDBA': '10.{0}.100.0/24'.format(
                     VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT)),
-                'ProspectsDBB': '10.{0}.101.0/24'.format(
+                'ProspectsDBB': '10.{0}.102.0/24'.format(
                     VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT)),
             }
         },
