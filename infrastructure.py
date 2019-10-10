@@ -20,6 +20,7 @@ class APIVPC(VPC):
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
     PROSPECTS_API = 'SharedProspectsAPI'
     FORSIGHT_API = 'SharedForsightAPI'
+    NOTIFICATIONS_API = 'SharedNotificationsAPI'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
 
@@ -78,6 +79,9 @@ class APIVPC(VPC):
         },
         FORSIGHT_API: {
             SECOND_OCTET: VPC.get_second_octet(FORSIGHT_API, ENVIRONMENT),
+        },
+        NOTIFICATIONS_API: {
+            SECOND_OCTET: VPC.get_second_octet(NOTIFICATIONS_API, ENVIRONMENT),
         },
         DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(DATA_MOVER, ENVIRONMENT),
