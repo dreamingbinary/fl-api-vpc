@@ -20,6 +20,8 @@ class APIVPC(VPC):
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
     PROSPECTS_API = 'SharedProspectsAPI'
     FORSIGHT_API = 'SharedForsightAPI'
+    NOTIFICATIONS_API = 'SharedNotificationsAPI'
+    FORWARDLINE_DB = 'ForwardlineDB'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
 
@@ -79,6 +81,9 @@ class APIVPC(VPC):
         FORSIGHT_API: {
             SECOND_OCTET: VPC.get_second_octet(FORSIGHT_API, ENVIRONMENT),
         },
+        NOTIFICATIONS_API: {
+            SECOND_OCTET: VPC.get_second_octet(NOTIFICATIONS_API, ENVIRONMENT),
+        },
         DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(DATA_MOVER, ENVIRONMENT),
         },
@@ -110,6 +115,18 @@ class APIVPC(VPC):
         },
     }
 
+    APIVPC_PROJECTS = {
+        FORWARDLINE_DB: {
+            SECOND_OCTET: VPC.get_second_octet(PROJECT, ENVIRONMENT),
+            PUBLIC_SUBNETS_CONFIG: {
+                'ForwardlineDBA': '10.{0}.100.0/24'.format(
+                    VPC.get_second_octet(PROJECT, ENVIRONMENT)),
+                'ForwardlineDBB': '10.{0}.101.0/24'.format(
+                    VPC.get_second_octet(PROJECT, ENVIRONMENT)),
+            }
+        }
+    }
+
     CIDR = BASE_VPC_CIDR.format(VPC_SECOND_OCTET)
     PUBLIC_NAT_SUBNETS = {
         'NATA': '10.{0}.0.0/27'.format(VPC_SECOND_OCTET),
@@ -128,6 +145,14 @@ class APIVPC(VPC):
             PRIVATE_SUBNETS.update({'{0}B'.format(project): '10.{0}.11.0/24'.format(second_octet)})
         if PUBLIC_SUBNETS_CONFIG in config:
             PUBLIC_SUBNETS.update(config[PUBLIC_SUBNETS_CONFIG])
+
+    for project, config in APIVPC_PROJECTS.items():
+        second_octet = config[SECOND_OCTET]
+        if PRIVATE_SUBNETS_CONFIG in config:
+            PRIVATE_SUBNETS.update(config[PRIVATE_SUBNETS_CONFIG])
+        if PUBLIC_SUBNETS_CONFIG in config:
+            PUBLIC_SUBNETS.update(config[PUBLIC_SUBNETS_CONFIG])
+
 
     INTERFACE_SUBNETS = {
         'InterfaceA': '10.{0}.3.0/25'.format(VPC_SECOND_OCTET),
