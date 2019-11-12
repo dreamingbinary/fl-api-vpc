@@ -21,6 +21,7 @@ class APIVPC(VPC):
     PROSPECTS_API = 'SharedProspectsAPI'
     FORSIGHT_API = 'SharedForsightAPI'
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
+    INTERVIEW_API = 'SharedInterviewAPI'
     FORWARDLINE_DB = 'ForwardlineDB'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
@@ -114,6 +115,14 @@ class APIVPC(VPC):
             },
         },
     }
+
+    # STG only projects
+    if ENVIRONMENT == 'STG':
+        PROJECTS.update({
+            INTERVIEW_API: {
+                SECOND_OCTET: VPC.get_second_octet(INTERVIEW_API, ENVIRONMENT),
+            },
+        })
 
     APIVPC_PROJECTS = {
         FORWARDLINE_DB: {
