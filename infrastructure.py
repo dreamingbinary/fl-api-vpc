@@ -21,6 +21,7 @@ class APIVPC(VPC):
     PROSPECTS_API = 'SharedProspectsAPI'
     FORSIGHT_API = 'SharedForsightAPI'
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
+    MILO_API = 'SharedMiloAPI'
     FORWARDLINE_DB = 'ForwardlineDB'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
@@ -86,6 +87,9 @@ class APIVPC(VPC):
         },
         DATA_MOVER: {
             SECOND_OCTET: VPC.get_second_octet(DATA_MOVER, ENVIRONMENT),
+        },
+        MILO_API: {
+            SECOND_OCTET: VPC.get_second_octet(MILO_API, ENVIRONMENT),
         },
         PROSPECTS_API: {
             SECOND_OCTET: VPC.get_second_octet(PROSPECTS_API, ENVIRONMENT),
