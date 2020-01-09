@@ -19,6 +19,7 @@ class APIVPC(VPC):
     DATA_MOVER = 'SharedDataMover'
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
     PROSPECTS_API = 'SharedProspectsAPI'
+    ANALYTICS_PLATFORM = 'SharedAnalyticsPlatformAPI'
     FORSIGHT_API = 'SharedForsightAPI'
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
     MILO_API = 'SharedMiloAPI'
@@ -78,6 +79,9 @@ class APIVPC(VPC):
                     }
                 },
             }
+        },
+        ANALYTICS_PLATFORM: {
+            SECOND_OCTET: VPC.get_second_octet(ANALYTICS_PLATFORM, ENVIRONMENT),
         },
         FORSIGHT_API: {
             SECOND_OCTET: VPC.get_second_octet(FORSIGHT_API, ENVIRONMENT),
