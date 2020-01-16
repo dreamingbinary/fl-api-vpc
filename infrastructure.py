@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-from troposphere import Ref, GetAtt, Join, ImportValue
 import json
 import sys
 import os
+
+from troposphere import Ref, GetAtt, ImportValue
 
 from fl_aws.blueprints.vpc import VPC
 
@@ -15,6 +16,7 @@ class APIVPC(VPC):
     BASE_VPC_CIDR = '10.{0}.0.0/16'
 
     BANKSTATEMENTS_API = 'SharedBankStatementsAPI'
+    NESTED_BANKSTATEMENTS_API = 'NestedBankStatementsAPI'
     APPLY_API = 'SharedApplyAPI'
     DATA_MOVER = 'SharedDataMover'
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
@@ -34,10 +36,37 @@ class APIVPC(VPC):
     PEERING_DESTINATION_ROUTE_TABLES_CONFIG = 'PEERING_DESTINATION_ROUTE_TABLES_CONFIG'
     PRIVATE_SUBNETS_CONFIG = 'PRIVATE_SUBNETS_CONFIG'
     PUBLIC_SUBNETS_CONFIG = 'PUBLIC_SUBNETS_CONFIG'
+    PEERING_CONNECTION = 'PeeringConnection'
 
     VPC_SECOND_OCTET = VPC.get_second_octet(PROJECT, ENVIRONMENT)
 
     PROSPECTS_ELASTIC_SEARCH_CIDR = BASE_VPC_CIDR.format(VPC.get_second_octet(PROSPECTS_ELASTIC_SEARCH, ENVIRONMENT))
+
+    NESTED_PROJECTS = {
+        NESTED_BANKSTATEMENTS_API: {
+            SECOND_OCTET: VPC.get_second_octet(NESTED_BANKSTATEMENTS_API, ENVIRONMENT),
+            PEERING_CONFIG: {
+                PEERING_DESTINATION_VPC_CONFIG: {
+                    'FAWSORG': {
+                        'STG': 'vpc-5e744b3a',
+                        'PRD': 'vpc-5e744b3a',
+                    }
+                },
+                PEERING_DESTINATION_RANGE_CONFIG: {
+                    'FAWSORG': {
+                        'STG': '10.173.0.0/22',
+                        'PRD': '10.173.0.0/22',
+                    }
+                },
+                PEERING_DESTINATION_ROUTE_TABLES_CONFIG: {
+                    'FAWSORG': {
+                        'STG': ['rtb-076b4660', 'rtb-05c0db8b6136b48a3'],
+                        'PRD': ['rtb-076b4660', 'rtb-2e847549'],
+                    }
+                }
+            }
+        },
+    }
 
     PROJECTS = {
         BANKSTATEMENTS_API: {
@@ -142,6 +171,19 @@ class APIVPC(VPC):
     }
     PUBLIC_SUBNETS = {}
     PRIVATE_SUBNETS = {}
+    NESTED_PUBLIC_SUBNETS = {}
+    NESTED_PRIVATE_SUBNETS = {}
+
+    for project, config in NESTED_PROJECTS.items():
+        second_octet = config[SECOND_OCTET]
+        NESTED_PROJECTS[project].update({'CIDR': BASE_VPC_CIDR.format(second_octet)})
+        if PRIVATE_SUBNETS_CONFIG in config:
+            NESTED_PRIVATE_SUBNETS.update(config[PRIVATE_SUBNETS_CONFIG])
+        else:
+            NESTED_PRIVATE_SUBNETS.update({'{0}A'.format(project): '10.{0}.10.0/24'.format(second_octet)})
+            NESTED_PRIVATE_SUBNETS.update({'{0}B'.format(project): '10.{0}.11.0/24'.format(second_octet)})
+        if PUBLIC_SUBNETS_CONFIG in config:
+            NESTED_PUBLIC_SUBNETS.update(config[PUBLIC_SUBNETS_CONFIG])
 
     for project, config in PROJECTS.items():
         second_octet = config[SECOND_OCTET]
@@ -184,6 +226,12 @@ class APIVPC(VPC):
                         peer_name='{0}-to-{1}-{2}'.format(self.PROJECT, vpc_name, self.ENVIRONMENT),
                         name_prefix=vpc_name
                     )
+                    config[self.PEERING_CONFIG][self.PEERING_CONNECTION] = peering_connection
+                    try:
+                        nested_project = project.replace('Shared', 'Nested')
+                        self.NESTED_PROJECTS[nested_project][self.PEERING_CONFIG][self.PEERING_CONNECTION] = peering_connection
+                    except:
+                        pass
 
                     """ Routes to Peering Connection for this VPC """
                     project_route_tables = [route_table for route_table in self.private_route_tables if project in route_table.title]
@@ -213,4 +261,5 @@ if __name__ == '__main__':
     api_vpc = APIVPC()
     api_vpc.init_template()
     api_vpc.add_components()
+    api_vpc.init_nested_template()
     print(api_vpc.t.to_json())
