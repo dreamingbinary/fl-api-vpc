@@ -36,6 +36,7 @@ class APIVPC(VPC):
     PEERING_DESTINATION_ROUTE_TABLES_CONFIG = 'PEERING_DESTINATION_ROUTE_TABLES_CONFIG'
     PRIVATE_SUBNETS_CONFIG = 'PRIVATE_SUBNETS_CONFIG'
     PUBLIC_SUBNETS_CONFIG = 'PUBLIC_SUBNETS_CONFIG'
+    PEERING_CONNECTION = 'PeeringConnection'
 
     VPC_SECOND_OCTET = VPC.get_second_octet(PROJECT, ENVIRONMENT)
 
@@ -225,6 +226,12 @@ class APIVPC(VPC):
                         peer_name='{0}-to-{1}-{2}'.format(self.PROJECT, vpc_name, self.ENVIRONMENT),
                         name_prefix=vpc_name
                     )
+                    config[self.PEERING_CONFIG][self.PEERING_CONNECTION] = peering_connection
+                    try:
+                        nested_project = project.replace('Shared', 'Nested')
+                        self.NESTED_PROJECTS[nested_project][self.PEERING_CONFIG][self.PEERING_CONNECTION] = peering_connection
+                    except:
+                        pass
 
                     """ Routes to Peering Connection for this VPC """
                     project_route_tables = [route_table for route_table in self.private_route_tables if project in route_table.title]
