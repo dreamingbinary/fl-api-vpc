@@ -26,6 +26,7 @@ class APIVPC(VPC):
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
     MILO_API = 'SharedMiloAPI'
     FORWARDLINE_DB = 'ForwardlineDB'
+    NESTED_REPORT_API = 'NestedReportAPI'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
 
@@ -65,6 +66,9 @@ class APIVPC(VPC):
                     }
                 }
             }
+        },
+        NESTED_REPORT_API: {
+            SECOND_OCTET: VPC.get_second_octet(NESTED_REPORT_API, ENVIRONMENT),
         },
     }
 
