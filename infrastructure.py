@@ -22,6 +22,7 @@ class APIVPC(VPC):
     OPPORTUNITY_FEEDER = 'SharedOpportunityFeeder'
     PROSPECTS_API = 'SharedProspectsAPI'
     ANALYTICS_PLATFORM = 'SharedAnalyticsPlatformAPI'
+    ANALYTICS = 'NestedAnalytics'
     FORSIGHT_API = 'SharedForsightAPI'
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
     MILO_API = 'SharedMiloAPI'
@@ -69,6 +70,9 @@ class APIVPC(VPC):
         },
         NESTED_REPORT_API: {
             SECOND_OCTET: VPC.get_second_octet(NESTED_REPORT_API, ENVIRONMENT),
+        },
+        ANALYTICS: {
+            SECOND_OCTET: VPC.get_second_octet(ANALYTICS, ENVIRONMENT),
         },
     }
 
