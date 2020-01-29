@@ -27,6 +27,7 @@ class APIVPC(VPC):
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
     MILO_API = 'SharedMiloAPI'
     FORWARDLINE_DB = 'ForwardlineDB'
+    FORWARDLINE_CODEBUILD = 'ForwardlineCodeBuild'
     NESTED_REPORT_API = 'NestedReportAPI'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
@@ -167,6 +168,15 @@ class APIVPC(VPC):
                 'ForwardlineDBA': '10.{0}.100.0/24'.format(
                     VPC.get_second_octet(PROJECT, ENVIRONMENT)),
                 'ForwardlineDBB': '10.{0}.101.0/24'.format(
+                    VPC.get_second_octet(PROJECT, ENVIRONMENT)),
+            }
+        },
+        FORWARDLINE_CODEBUILD: {
+            SECOND_OCTET: VPC.get_second_octet(PROJECT, ENVIRONMENT),
+            PRIVATE_SUBNETS_CONFIG: {
+                'ForwardlineCodeBuildA': '10.{0}.10.0/24'.format(
+                    VPC.get_second_octet(PROJECT, ENVIRONMENT)),
+                'ForwardlineCodeBuildB': '10.{0}.11.0/24'.format(
                     VPC.get_second_octet(PROJECT, ENVIRONMENT)),
             }
         }
