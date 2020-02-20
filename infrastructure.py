@@ -37,6 +37,7 @@ class APIVPC(VPC):
     PEERING_DESTINATION_VPC_CONFIG = 'PEERING_DESTINATION_VPC_CONFIG'
     PEERING_DESTINATION_RANGE_CONFIG = 'PEERING_DESTINATION_RANGE_CONFIG'
     PEERING_DESTINATION_ROUTE_TABLES_CONFIG = 'PEERING_DESTINATION_ROUTE_TABLES_CONFIG'
+    PEERING_DESTINATION_NAME = 'PEERING_DESTINATION_NAME'
     PRIVATE_SUBNETS_CONFIG = 'PRIVATE_SUBNETS_CONFIG'
     PUBLIC_SUBNETS_CONFIG = 'PUBLIC_SUBNETS_CONFIG'
     PEERING_CONNECTION = 'PeeringConnection'
@@ -49,6 +50,7 @@ class APIVPC(VPC):
         NESTED_BANKSTATEMENTS_API: {
             SECOND_OCTET: VPC.get_second_octet(NESTED_BANKSTATEMENTS_API, ENVIRONMENT),
             PEERING_CONFIG: {
+                PEERING_DESTINATION_NAME: 'FAWSORG',
                 PEERING_DESTINATION_VPC_CONFIG: {
                     'FAWSORG': {
                         'STG': 'vpc-5e744b3a',
@@ -71,6 +73,15 @@ class APIVPC(VPC):
         },
         NESTED_REPORT_API: {
             SECOND_OCTET: VPC.get_second_octet(NESTED_REPORT_API, ENVIRONMENT),
+            PEERING_CONFIG: {
+                PEERING_DESTINATION_NAME: 'FAWSORG',
+                PEERING_DESTINATION_RANGE_CONFIG: {
+                    'OVERVIEWDB': {
+                        'STG': '10.173.2.128/27',
+                        'PRD': '10.173.1.192/27',
+                    }
+                },
+            }
         },
         ANALYTICS: {
             SECOND_OCTET: VPC.get_second_octet(ANALYTICS, ENVIRONMENT),
@@ -192,6 +203,8 @@ class APIVPC(VPC):
     NESTED_PUBLIC_SUBNETS = {}
     NESTED_PRIVATE_SUBNETS = {}
 
+    PEERING_CONNECTIONS = {}
+
     for project, config in NESTED_PROJECTS.items():
         second_octet = config[SECOND_OCTET]
         NESTED_PROJECTS[project].update({'CIDR': BASE_VPC_CIDR.format(second_octet)})
@@ -238,18 +251,14 @@ class APIVPC(VPC):
                         continue
 
                     """ Peering Connection """
+                    peering_connection_name = '{0}-to-{1}-{2}'.format(self.PROJECT, vpc_name, self.ENVIRONMENT)
                     peering_connection = self.ec2_helper.create_peering_connection(
                         vpc=Ref(self.vpc),
                         peer_vpc=peering_config[self.PEERING_DESTINATION_VPC_CONFIG][vpc_name][self.ENVIRONMENT],
-                        peer_name='{0}-to-{1}-{2}'.format(self.PROJECT, vpc_name, self.ENVIRONMENT),
+                        peer_name=peering_connection_name,
                         name_prefix=vpc_name
                     )
-                    config[self.PEERING_CONFIG][self.PEERING_CONNECTION] = peering_connection
-                    try:
-                        nested_project = project.replace('Shared', 'Nested')
-                        self.NESTED_PROJECTS[nested_project][self.PEERING_CONFIG][self.PEERING_CONNECTION] = peering_connection
-                    except:
-                        pass
+                    self.PEERING_CONNECTIONS.update({vpc_name: peering_connection})
 
                     """ Routes to Peering Connection for this VPC """
                     project_route_tables = [route_table for route_table in self.private_route_tables if project in route_table.title]
