@@ -24,6 +24,7 @@ class APIVPC(VPC):
     ANALYTICS_PLATFORM = 'SharedAnalyticsPlatformAPI'
     ANALYTICS = 'NestedAnalytics'
     FORSIGHT_API = 'SharedForsightAPI'
+    FRAUD_API = 'NestedFraudAPI'
     NOTIFICATIONS_API = 'SharedNotificationsAPI'
     MILO_API = 'SharedMiloAPI'
     FORWARDLINE_DB = 'ForwardlineDB'
@@ -85,6 +86,9 @@ class APIVPC(VPC):
         },
         ANALYTICS: {
             SECOND_OCTET: VPC.get_second_octet(ANALYTICS, ENVIRONMENT),
+        },
+        FRAUD_API: {
+            SECOND_OCTET: VPC.get_second_octet(FRAUD_API, ENVIRONMENT),
         },
     }
 
