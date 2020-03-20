@@ -90,6 +90,16 @@ class APIVPC(VPC):
         },
         FRAUD_API: {
             SECOND_OCTET: VPC.get_second_octet(FRAUD_API, ENVIRONMENT),
+            PRIVATE_SUBNETS_CONFIG: {
+                '{0}A'.format(FRAUD_API): '10.{0}.10.0/24'.format(
+                    VPC.get_second_octet(FRAUD_API, ENVIRONMENT)),
+                '{0}B'.format(FRAUD_API): '10.{0}.11.0/24'.format(
+                    VPC.get_second_octet(FRAUD_API, ENVIRONMENT)),
+                '{0}RedisA'.format(FRAUD_API): '10.{0}.12.0/24'.format(
+                    VPC.get_second_octet(FRAUD_API, ENVIRONMENT)),
+                '{0}RedisB'.format(FRAUD_API): '10.{0}.13.0/24'.format(
+                    VPC.get_second_octet(FRAUD_API, ENVIRONMENT)),
+            }
         },
         CREDIT_BUREAU_API: {
             SECOND_OCTET: VPC.get_second_octet(CREDIT_BUREAU_API, ENVIRONMENT),
