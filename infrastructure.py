@@ -31,6 +31,7 @@ class APIVPC(VPC):
     FORWARDLINE_DB = 'ForwardlineDB'
     FORWARDLINE_CODEBUILD = 'ForwardlineCodeBuild'
     NESTED_REPORT_API = 'NestedReportAPI'
+    NESTED_PPP_API = 'NestedPPPAPI'
 
     PROSPECTS_ELASTIC_SEARCH = 'ProspectsElasticsearch'
 
@@ -59,6 +60,24 @@ class APIVPC(VPC):
                         'PRD': 'vpc-5e744b3a',
                     }
                 },
+                PEERING_DESTINATION_RANGE_CONFIG: {
+                    'FAWSORG': {
+                        'STG': '10.173.0.0/22',
+                        'PRD': '10.173.0.0/22',
+                    }
+                },
+                PEERING_DESTINATION_ROUTE_TABLES_CONFIG: {
+                    'FAWSORG': {
+                        'STG': ['rtb-076b4660', 'rtb-05c0db8b6136b48a3'],
+                        'PRD': ['rtb-076b4660', 'rtb-2e847549'],
+                    }
+                }
+            }
+        },
+        NESTED_PPP_API: {
+            SECOND_OCTET: VPC.get_second_octet(NESTED_PPP_API, ENVIRONMENT),
+            PEERING_CONFIG: {
+                PEERING_DESTINATION_NAME: 'FAWSORG',
                 PEERING_DESTINATION_RANGE_CONFIG: {
                     'FAWSORG': {
                         'STG': '10.173.0.0/22',
